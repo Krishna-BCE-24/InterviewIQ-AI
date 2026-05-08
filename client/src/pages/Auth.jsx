@@ -11,7 +11,7 @@ import { useDispatch } from 'react-redux';
 import { setUserData } from '../redux/userSlice';
 function Auth({isModel = false}) {
     const dispatch = useDispatch()
-
+    const [loading, setLoading] = useState(false)
   const handleGoogleAuth = async () => {
 
     if (loading) return;
