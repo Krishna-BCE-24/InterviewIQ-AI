@@ -3,6 +3,7 @@ import { motion } from "motion/react"
 import {
     FaUserTie,
     FaBriefcase,
+    FaUsers,
     FaFileUpload,
     FaMicrophoneAlt,
     FaChartLine,
@@ -12,7 +13,11 @@ import axios from "axios"
 import { ServerUrl } from '../App';
 import { useDispatch, useSelector } from 'react-redux';
 import { setUserData } from '../redux/userSlice';
-function Step1SetUp({ onStart }) {
+function Step1SetUp({
+  onStart,
+  aiGender,
+  setAiGender
+}) {
     const {userData}= useSelector((state)=>state.user)
     const dispatch = useDispatch()
     const [role, setRole] = useState("");
@@ -105,6 +110,9 @@ function Step1SetUp({ onStart }) {
                                 {
                                     icon: <FaMicrophoneAlt className="text-green-600 text-xl" />,
                                     text: "Smart Voice Interview",
+                                },
+                                {icon: <FaUsers className="text-green-600 text-xl" />,
+                                        text: "Choose Male or Female Interviewer",
                                 },
                                 {
                                     icon: <FaChartLine className="text-green-600 text-xl" />,
@@ -247,15 +255,47 @@ function Step1SetUp({ onStart }) {
 
                             </motion.div>
                         )}
+<div className="mb-4">
 
+  <h3 className="text-lg font-semibold text-gray-700 mb-3">
+    Choose AI Interviewer
+  </h3>
 
-                        <motion.button
-                        onClick={handleStart}
-                            disabled={!role || !experience || loading}
+  <div className="flex gap-4">
+
+    <button
+      type="button"
+      onClick={() => setAiGender("male")}
+      className={`flex-1 py-3 rounded-xl border transition-all duration-300 font-medium ${
+        aiGender === "male"
+          ? "bg-green-600 text-white border-green-600"
+          : "bg-white text-gray-700 border-gray-300"
+      }`}
+    >
+      👨 Male Interviewer
+    </button>
+
+    <button
+      type="button"
+      onClick={() => setAiGender("female")}
+      className={`flex-1 py-3 rounded-xl border transition-all duration-300 font-medium ${
+        aiGender === "female"
+          ? "bg-pink-500 text-white border-pink-500"
+          : "bg-white text-gray-700 border-gray-300"
+      }`}
+    >
+      👩 Female Interviewer
+    </button>
+
+  </div>
+</div>
+ <motion.button
+             onClick={handleStart}
+                    disabled={!role || !experience || loading}
                             whileHover={{ scale: 1.03 }}
                             whileTap={{ scale: 0.95 }}
                             className='w-full disabled:bg-gray-600 bg-green-600 hover:bg-green-700 text-white py-3 rounded-full text-lg font-semibold transition duration-300 shadow-md'>
-                            {loading ? "Staring...":"Start Interview"}
+                            {loading ? "Starting...":"Start Interview"}
 
 
                         </motion.button>

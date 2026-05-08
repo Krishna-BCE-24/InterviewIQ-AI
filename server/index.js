@@ -16,8 +16,7 @@ app.use(cors({
     "https://interviewiq-client-9ahc.onrender.com"
   ],
   credentials: true
-}));
-
+}))
 
 app.use(express.json())
 app.use(cookieParser())

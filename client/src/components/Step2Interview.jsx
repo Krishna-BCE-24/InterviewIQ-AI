@@ -11,7 +11,11 @@ import axios from "axios"
 import { ServerUrl } from '../App'
 import { BsArrowRight } from 'react-icons/bs'
 
-function Step2Interview({ interviewData, onFinish }) {
+function Step2Interview({
+  interviewData,
+  onFinish,
+  aiGender
+}) {
   const { interviewId, questions, userName } = interviewData;
   const [isIntroPhase, setIsIntroPhase] = useState(true);
 
@@ -27,7 +31,7 @@ function Step2Interview({ interviewData, onFinish }) {
   );
   const [selectedVoice, setSelectedVoice] = useState(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [voiceGender, setVoiceGender] = useState("female");
+  const voiceGender = aiGender;
   const [subtitle, setSubtitle] = useState("");
 
 
@@ -36,50 +40,53 @@ function Step2Interview({ interviewData, onFinish }) {
   const currentQuestion = questions[currentIndex];
 
 
-  useEffect(() => {
-    const loadVoices = () => {
-      const voices = window.speechSynthesis.getVoices();
-      if (!voices.length) return;
+useEffect(() => {
+  const loadVoices = () => {
+    const voices = window.speechSynthesis.getVoices();
 
-      // Try known female voices first
-      const femaleVoice =
-        voices.find(v =>
-          v.name.toLowerCase().includes("zira") ||
-          v.name.toLowerCase().includes("samantha") ||
-          v.name.toLowerCase().includes("female")
-        );
+    if (!voices.length) return;
 
-      if (femaleVoice) {
-        setSelectedVoice(femaleVoice);
-        setVoiceGender("female");
-        return;
-      }
+    // FEMALE INTERVIEWER
+    if (voiceGender === "female") {
 
-      // Try known male voices
-      const maleVoice =
-        voices.find(v =>
-          v.name.toLowerCase().includes("david") ||
-          v.name.toLowerCase().includes("mark") ||
-          v.name.toLowerCase().includes("male")
-        );
+      const femaleVoice = voices.find(v =>
+        v.name.toLowerCase().includes("zira") ||
+        v.name.toLowerCase().includes("samantha") ||
+        v.name.toLowerCase().includes("female")
+      );
 
-      if (maleVoice) {
-        setSelectedVoice(maleVoice);
-        setVoiceGender("male");
-        return;
-      }
+      setSelectedVoice(femaleVoice || voices[0]);
+      return;
+    }
 
-      // Fallback: first voice (assume female)
-      setSelectedVoice(voices[0]);
-      setVoiceGender("female");
-    };
+    // MALE INTERVIEWER
+    if (voiceGender === "male") {
 
-    loadVoices();
-    window.speechSynthesis.onvoiceschanged = loadVoices;
+      const maleVoice = voices.find(v =>
+        v.name.toLowerCase().includes("david") ||
+        v.name.toLowerCase().includes("mark") ||
+        v.name.toLowerCase().includes("alex") ||
+        v.name.toLowerCase().includes("male")
+      );
 
-  }, [])
+      setSelectedVoice(maleVoice || voices[0]);
+      return;
+    }
+
+    // FALLBACK
+    setSelectedVoice(voices[0]);
+  };
+
+  loadVoices();
+
+  window.speechSynthesis.onvoiceschanged = loadVoices;
+
+}, [voiceGender]);
 
   const videoSource = voiceGender === "male" ? maleVideo : femaleVideo;
+  console.log("aiGender:", aiGender);
+console.log("voiceGender:", voiceGender);
+console.log("videoSource:", videoSource);
 
 
   /* ---------------- SPEAK FUNCTION ---------------- */
@@ -334,16 +341,19 @@ setIsSubmitting(false)
         {/* video section */}
         <div className='w-full lg:w-[35%] bg-white flex flex-col items-center p-6 space-y-6 border-r border-gray-200'>
           <div className='w-full max-w-md rounded-2xl overflow-hidden shadow-xl'>
-            <video
-              src={videoSource}
-              key={videoSource}
-              ref={videoRef}
-              muted
-              playsInline
-              preload="auto"
-              className="w-full h-auto object-cover"
-            />
-          </div>
+  <video
+  key={videoSource}
+  ref={videoRef}
+  muted
+  autoPlay
+  loop
+  playsInline
+  preload="auto"
+  className="w-full h-auto object-cover"
+>
+  <source src={videoSource} type="video/mp4" />
+</video>
+    </div>
 
           {/* subtitle */}
           {subtitle && (

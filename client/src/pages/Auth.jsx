@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useState } from 'react'
 import { BsRobot } from "react-icons/bs";
 import { IoSparkles } from "react-icons/io5";
 import { motion } from "motion/react"
@@ -12,23 +12,41 @@ import { setUserData } from '../redux/userSlice';
 function Auth({isModel = false}) {
     const dispatch = useDispatch()
 
-    const handleGoogleAuth = async () => {
-        try {
-            const response = await signInWithPopup(auth,provider)
-            let User = response.user
-            let name = User.displayName
-            let email = User.email
-            const result = await axios.post(ServerUrl + "/api/auth/google" , {name , email} , {withCredentials:true})
-            dispatch(setUserData(result.data))
-            
+  const handleGoogleAuth = async () => {
 
+    if (loading) return;
 
-            
-        } catch (error) {
-            console.log(error)
-              dispatch(setUserData(null))
-        }
+    setLoading(true);
+
+    try {
+
+        const response = await signInWithPopup(auth, provider)
+
+        let User = response.user
+
+        let name = User.displayName
+        let email = User.email
+
+        const result = await axios.post(
+            ServerUrl + "/api/auth/google",
+            { name, email },
+            { withCredentials: true }
+        )
+
+        dispatch(setUserData(result.data))
+
+    } catch (error) {
+
+        console.log(error)
+
+        dispatch(setUserData(null))
+
+    } finally {
+
+        setLoading(false)
+
     }
+}
   return (
     <div className={`
       w-full 
@@ -68,11 +86,12 @@ function Auth({isModel = false}) {
 
             <motion.button 
             onClick={handleGoogleAuth}
+            disabled={loading}
             whileHover={{opacity:0.9 , scale:1.03}}
             whileTap={{opacity:1 , scale:0.98}}
             className='w-full flex items-center justify-center gap-3 py-3 bg-black text-white rounded-full shadow-md '>
                 <FcGoogle size={20}/>
-                Continue with Google
+                {loading ? "Loading..." : "Continue with Google"}
 
    
             </motion.button>
